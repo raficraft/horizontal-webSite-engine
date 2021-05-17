@@ -1,15 +1,3 @@
-debounce = (callback, delay) => {
-	let timer;
-	return function(){
-			let args = arguments;
-			let context = this;
-			clearTimeout(timer);
-			timer = setTimeout(function(){
-					callback.apply(context, args);
-			}, delay)
-	}
-}
-
 class ScrollHorizontalManager{
 
 	constructor(params = {}){	
@@ -53,7 +41,7 @@ class ScrollHorizontalManager{
 			this.allLink[0].classList.add(`${this.params.linkClassName}__active`) 
 		}
 
-		window.addEventListener('resize', debounce(()=>{
+		window.addEventListener('resize', this.debounce(()=>{
 			this.transalteSlide(0)
 			this.scroll = (window.innerWidth / 100) * this.params.slideSize
 			this.scrollContainer.style.transform = this.currentTranslate
@@ -129,7 +117,7 @@ class ScrollHorizontalManager{
 
 	slider(){
 
-		window.addEventListener('mousewheel', debounce(function(e) {
+		window.addEventListener('mousewheel', this.debounce(function(e) {
 
 			const numberPattern = new RegExp(/\d+/g);
 			this.currentTranslate = parseInt(this.scrollContainer.style.transform.match(numberPattern))
@@ -200,11 +188,6 @@ class ScrollHorizontalManager{
 		}
 
 		},100).bind(this))
-
-
-
-
-
 	}
 
 	keyBoardControl(){	
@@ -287,11 +270,6 @@ class ScrollHorizontalManager{
 
 				e.preventDefault()
 
-				console.log(e);
-				console.log(count);
-
-				
-
 				let newScroll = 0
 				const numberPattern = new RegExp(/\d+/g);
 				this.currentTranslate = parseInt(this.scrollContainer.style.transform.match(numberPattern))
@@ -362,7 +340,19 @@ class ScrollHorizontalManager{
 		this.scrollContainer.style.transitionDuration = `${this.params.slideTransition}s`
 	}
 
+	debounce(callback,delay){
 
+		let timer;
+		return function(){
+				let args = arguments;
+				let context = this;
+				clearTimeout(timer);
+				timer = setTimeout(function(){
+						callback.apply(context, args);
+				}, delay)
+		}
+
+	}
 }
 
 
