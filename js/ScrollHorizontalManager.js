@@ -45,11 +45,13 @@ class ScrollHorizontalManager{
 		if(this.params.slideLink === true){
 			this.linkCollection = document.querySelectorAll(`[data-${this.params.sliderName}Link]`)
 			this.slideLink()
+			this.linkCollection[0].classList.add(`active`) 
 		}
 
 		console.log(this);
 
 		this.drawSliderPage()
+		this.keyBoardControl()
 
 
 
@@ -71,7 +73,7 @@ class ScrollHorizontalManager{
 		}	
 
 		//Define width of parent container of slide
-		this.widthContainer = `${(this.nbSlide * this.params.slideWidth)}% `		
+		this.widthContainer = `${(this.nbSlide * this.params.slideWidth)}vw `		
 		this.scrollContainer.style.width = this.widthContainer 
 		this.scrollContainer.style.transitionDuration = `0s`
 
@@ -83,12 +85,12 @@ class ScrollHorizontalManager{
 			if (Object.hasOwnProperty.call(this.slideCollection, key)) {
 
 				const slideItem = this.slideCollection[key];
-				slideItem.style.minWidth = `${this.params.slideWidth}%`
+				slideItem.style.minWidth = `${this.params.slideWidth}vw`
 				slideItem.setAttribute('id',`${this.params.sliderName}_${key}`)	
 				
 				//Resize lastSlide if infiniteLoop = false
 				if(parseInt(key) === parseInt(this.nbSlide) - 1 && this.params.infiniteLoop === false && this.params.slideWidth < 100){
-					slideItem.style.minWidth = `100%`
+					slideItem.style.minWidth = `100vw`
 				}
 				
 			}
@@ -170,6 +172,8 @@ class ScrollHorizontalManager{
 				this.params.currentSlide = parseInt(splitHref[1])
 				this.goToSlide(this.params.currentSlide)
 
+				this.linkToggleClass(this.params.currentSlide)
+
 			})
 			
 		});
@@ -179,23 +183,125 @@ class ScrollHorizontalManager{
 
 	keyBoardControl(){
 
+		window.addEventListener('keyup',e =>{
+
+			const slideLimit = this.nbSlide - this.offset -1
+
+			if(e.key === 'ArrowRight' || e.key === 'Right'){
+				const newIdx = this.params.currentSlide + 1
+			//	console.log(newIdx);
+
+				if(newIdx <= slideLimit){
+					this.goToSlide(newIdx)
+					this.params.currentSlide = newIdx
+				}
+				
+			 if(this.params.infiniteLoop === true){
+
+					//if limit let's go to 0
+
+					if(newIdx > slideLimit){
+					this.disabledTransition()
+					this.goToSlide(0)
+					this.params.currentSlide = 0
+					setTimeout(()=>{
+						this.enabledTransition()
+						this.goToSlide(this.offset)
+						this.params.currentSlide = this.offset
+					},0)
+				
+					}
+
+				}
+
+
+				//On Work !!!
+			
+				let linkActiveIdx = this.params.currentSlide	
+				if(linkActiveIdx <= 0 && this.params.infiniteLoop === true){
+					linkActiveIdx = this.offset
+				}
+
+				this.linkToggleClass(linkActiveIdx)
+
+			
+
+
+
+			}else if(e.key === 'ArrowLeft' || e.key === 'Left'){
+
+				console.log('key');
+
+				const newIdx = this.params.currentSlide - 1
+
+				
+				
+				console.error(newIdx);	
+
+					if(newIdx >= 0){
+						this.goToSlide(newIdx)
+						this.params.currentSlide = newIdx
+					}
+					
+				if(this.params.infiniteLoop === true){
+
+					console.log(newIdx);
+					console.log(slideLimit);
+					if(newIdx < 0){
+
+						console.log('youpi');
+
+						this.disabledTransition()
+						this.goToSlide(this.nbSlide - 2)
+						this.params.currentSlide = this.nbSlide - 2
+						
+						setTimeout(()=>{
+							this.enabledTransition()
+							this.goToSlide(this.params.currentSlide-1)
+							this.params.currentSlide = this.params.currentSlide -1
+						},0)
+					
+						}
+
+				}
+
+				let linkActiveIdx = this.params.currentSlide	
+				if(linkActiveIdx <= 0 && this.params.infiniteLoop === true){
+					linkActiveIdx = this.offset
+				}
+
+				this.linkToggleClass(linkActiveIdx)
+
+
+			}
+		})
+
 	}
 
 	goToSlide(idx){
 
 		const value = idx * this.params.slideWidth
-		this.scrollContainer.style.transform = `translate(-${value}%)`
+		this.scrollContainer.style.transform = `translate(-${value}vw)`
 		this.spy()
 
 	}
 
 
+	linkToggleClass(idx){
+
+		document.querySelector('.active').classList.remove('active')		
+		const thisLinkActive = document.querySelector(`[href=${this.params.sliderName}_${idx}]`)
+		thisLinkActive.classList.add('active')
+
+	}
+
 
 
 	spy(){
+		/*
 		console.log('############################################');
 		console.log(this.params);
-		console.log(this);
+		console.log(this);*/
 	}
 
 

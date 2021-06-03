@@ -136,6 +136,8 @@ h1{
   position : absolute;
   width : 100%;
   display: flex;
+  
+  overflow: hidden;
 }
 
 .horizontal-scroll-wrapper .slide{
@@ -184,6 +186,6 @@ h1{
 
 }
 
-.linkSlideHorizontal__active{
+.active{
   background-color: rgb(134, 134, 134);
 }
