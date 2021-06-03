@@ -1,38 +1,70 @@
 class ScrollHorizontalManager{
 
-	constructor(params = {}){	
+	 /** 
+   * @param {HTMLElement} element
+   * @param {object}  params
+   * @param {object}  [slideName] Container du slide
+   * @param {number}  [slideSize] Largeur du slide par apport à la flargeur de la fenêtre
+   * @param {number}  [slideTransition] Durée de la transition
+   * @param {boolean} [slideLink] Navigation lié à ce slide
+   * @param {boolean} [jumpLink] Désactive l'animation du slide lors du click sur les liens de l'animation
+   * @param {HTMLElement} [pushUp] Recalcule la hauteur du slide en fonction du 
+   */
 
+	constructor(params = {}){	
+	
 		this.params = Object.assign({},{
+			silder : true,
+			sliderName : 'horizontalScroll',
 
 			slideSize : 80,
 			slideTransition : .3,
+
 			slideLink : false,
 			jumpLink : false,
 			infiniteLoop : false,
+
 			pushUp : false,
 			pushDown : false,
-			linkClassName : 'linkSlideHorizontal'
+
+			linkClassName : 'linkSlideHorizontal',
+			linkClassRemove : true,
 
 		},params)
 
-		this.scrollContainer = document.querySelector('[horizontalScroll]')
-		this.scrollContainer.style.transitionDuration = `${this.params.slideTransition}s`
 
-		this.slide = document.querySelector('[slide]')
-		this.allSlide = document.querySelectorAll('[slide]')
+		console.log(this.params);
+
+
+		this.allSlide = document.querySelectorAll(`[data-slide="${this.params.sliderName}"]`)
 		this.nbSlide = this.allSlide.length
 		this.lastSlideIdx = this.nbSlide - 1
 		this.firstSlide = this.allSlide[0]
 		this.lastSlide = this.allSlide[this.lastSlideIdx]
-		
-		this.currentTranslate = `translate(0px)`
-		this.scroll = Math.ceil((window.innerWidth / 100) * this.params.slideSize)
-		this.scrollContainer.style.transform = this.currentTranslate
+
+		this.currentTranslate = 0
+		this.scrollContainer = document.querySelector(`[data-${this.params.sliderName}]`)
+		this.scrollContainer.style.transitionDuration = `${this.params.slideTransition}s`
+		this.scrollContainer.style.transform = `translate(${this.currentTranslate}px)`
+		this.scroll = Math.ceil((this.scrollContainer.offsetWidth / 100) * this.params.slideSize)
+		console.log(this.scroll);
 		this.scrollLimit = (Math.ceil(this.scroll) * this.nbSlide) - Math.ceil(this.scroll)	
-	
-		this.drawSlider()
+
+		console.log(this.scrollContainer.offsetWidth * this.nbSlide);	
+
+		//Système Conditionelle is hover
+
+		this.drawSliderPage()
 		this.keyBoardControl()
-		this.slider()
+		if(this.params.slider === true){
+
+			console.log('slider on');
+			this.scrollContainer.style.position = 'fixed'
+			this.slider()
+
+		}else{
+			this.scrollContainer.style.position = 'absolute'
+		}
 
 
 		if(this.params.slideLink === true){
@@ -41,24 +73,18 @@ class ScrollHorizontalManager{
 			this.allLink[0].classList.add(`${this.params.linkClassName}__active`) 
 		}
 
-		window.addEventListener('resize', this.debounce(()=>{
-			this.transalteSlide(0)
-			this.scroll = (window.innerWidth / 100) * this.params.slideSize
-			this.scrollContainer.style.transform = this.currentTranslate
-			this.scrollLimit = (Math.ceil(this.scroll) * this.nbSlide) - Math.ceil(this.scroll)	
-			if(this.params.infiniteLoop === true){
-				this.jumpToSlide(this.scroll)
-			}
 
-			if(this.params.slideLink === true){
-				this.toggleLinkClass(0)
-			}
+		window.addEventListener('resize', this.debounce(()=>{
+
+			new ScrollHorizontalManager(this.params)	
 
 		},300))
 
 	}
 
-	drawSlider(){
+	//ENGINE
+
+	drawSliderPage = () => {
 
 		this.pushUpResize = false
 		this.pushDownResize = false
@@ -68,19 +94,30 @@ class ScrollHorizontalManager{
 		if(this.params.pushUp !== false && typeof(this.params.pushUp) === 'string'){
 
 			const pushUpEl = document.querySelector(`${this.params.pushUp}`)
+			if(pushUpEl){
 			this.pushUpVal = pushUpEl.offsetHeight 
 			this.scrollContainer.style.top = `${this.pushUpVal}px`
 			this.pushUpResize = true
+			}else{
+				console.error(`Element HTML , ${this.params.pushUpEL} non présent`);
+			}
+
 
 		}		
+
+		//Présence d'un footer
 
 		if(this.params.pushDown !== false && typeof(this.params.pushDown) === 'string'){
 
 			console.log(`${this.params.pushDown}`);
 
 			const pushDownEl = document.querySelector(`${this.params.pushDown}`)
+			if(pushDownEl){
 			this.pushDownVal = pushDownEl.offsetHeight 
 			this.pushDownResize = true
+			}else{
+				console.error(`Element HTML , ${this.params.pushDown} non présent`);
+			}
 
 		}		
 
@@ -94,15 +131,15 @@ class ScrollHorizontalManager{
 				this.allSlide[this.nbSlide -1].style.minWidth = `100vw`
 			}
 
-			console.log(this.pushUpResize);
-			console.log(this.pushDownResize);
+			//console.log(this.pushUpResize);
+		//	console.log(this.pushDownResize);
 
-			if(this.pushUpResize === true && this.pushDownResize === false){
+			if(this.pushUpResize === true && this.pushDownResize === false && this.params.slider === true){
 
 				this.scrollContainer.style.height = `calc(100vh - ${this.pushUpVal}px)`
-				this.allSlide[count].style.height = `calc(100vh - ${this.pushUpVal}px)`				
+				this.allSlide[count].style.height = `calc(100vh - ${this.pushUpVal}px)`			
 
-			}else if(this.pushUpResize === true && this.pushDownResize === true){				
+			}else if(this.pushUpResize === true && this.pushDownResize === true && this.params.slider === true){				
 
 				this.scrollContainer.style.height = `calc(100vh - ${this.pushUpVal}px - ${this.pushDownVal}px)`
 				this.allSlide[count].style.height = `calc(100vh - ${this.pushUpVal}px - ${this.pushDownVal}px)`	
@@ -211,7 +248,7 @@ class ScrollHorizontalManager{
 
 				// link Style Management
 
-				if(this.params.slideLink === true){
+				if(this.params.slideLink === true && this.params.infiniteLoop === true){
 
 					this.sectionIdx = Math.ceil((this.currentTranslate / this.scroll) + 1)
 					if(this.sectionIdx <= this.nbSlide){
@@ -223,6 +260,14 @@ class ScrollHorizontalManager{
 						setTimeout( () => { this.toggleLinkClass(0) }, 200 )
 
 					}	
+
+				}else if(this.params.slideLink === true && this.params.infiniteLoop === false){
+
+					this.sectionIdx = Math.ceil((this.currentTranslate / this.scroll) + 1);
+
+					if(this.sectionIdx < this.nbSlide){
+						this.toggleLinkClass(this.sectionIdx)	
+					}
 				}
 				
 			}else  if(e.key === 'ArrowLeft' || e.key === 'Left'){
@@ -244,7 +289,7 @@ class ScrollHorizontalManager{
 
 					// link Style Management
 
-					if(this.params.slideLink === true){					
+					if(this.params.slideLink === true && this.params.infiniteLoop === true){					
 	
 						this.sectionIdx = Math.ceil((this.currentTranslate / this.scroll) - 1)
 	
@@ -254,7 +299,15 @@ class ScrollHorizontalManager{
 							setTimeout( () => { this.toggleLinkClass(this.nbSlide - 1)	}, 200 )
 						}
 		
-					}
+					}else if(this.params.slideLink === true && this.params.infiniteLoop === false){
+
+						this.sectionIdx = Math.ceil((this.currentTranslate / this.scroll) - 1);
+
+						if(this.sectionIdx >= 0){
+							this.toggleLinkClass(this.sectionIdx)	
+						}
+				}
+				
 					
 			}
 		})
@@ -279,6 +332,9 @@ class ScrollHorizontalManager{
 				}else{
 					newScroll = (Math.ceil(this.scroll) * count) + this.scroll
 				}
+
+				console.log(this.params.jumpLink);
+
 				if(this.params.jumpLink === false){
 					this.transalteSlide(newScroll)
 				}else{
@@ -294,13 +350,13 @@ class ScrollHorizontalManager{
 	}
 
 	infiniteLoop(){
+
 		const cloneFirstSlide = this.firstSlide.cloneNode(true)
 		const cloneLastSlide = this.lastSlide.cloneNode(true)
 
 		this.scrollContainer.insertAdjacentElement('afterbegin',cloneLastSlide)
 		this.scrollContainer.insertAdjacentElement('beforeEnd',cloneFirstSlide)
 
-		this.slide = document.querySelector('.slide')
 		this.allSlide = document.querySelectorAll('.slide')
 		this.nbSlideLoop = this.allSlide.length
 
@@ -308,7 +364,7 @@ class ScrollHorizontalManager{
 		this.jumpToSlide(this.scroll)		
 	}
 
-	//utils
+	//UTILS
 
 	transalteSlide(value){
 		this.scrollContainer.style.transform = `translate(-${value}px)`
@@ -355,11 +411,63 @@ class ScrollHorizontalManager{
 	}
 }
 
-
-
-new ScrollHorizontalManager({
-	slideSize : 95,
+const horizontalScroll = new ScrollHorizontalManager({
+	slideSize : 50,
+	slider : false,
 	pushUp : '.headerTop',
 	slideLink : true,
-	infiniteLoop : true,
+	jumpLink : false,
+	infiniteLoop : false,
 })
+
+
+
+console.log(horizontalScroll);
+
+
+//Ajoute des slide à chaque redimensionnement
+//Retirer les slide au redimensionnement 
+// Conserver le silde active en mémoire
+
+
+/*
+class ToucheEventManager extends ScrollHorizontalManager{
+
+
+
+	constructor(){
+		super()
+
+
+				this.scrollContainer.addEventListener('mousemove',(e) => { this.dragSlide(e) })
+		this.scrollContainer.addEventListener('mousedown',(e) => { this.startDrag(e) })
+
+
+
+		
+	}
+
+	startDrag(e){
+		this.origin = {x : e.clientX , y : e.clientY}
+		console.log(this.currentTranslate);
+		
+	//	console.log(this.origin);
+	}
+
+	dragSlide(e){
+		let point = e
+		let translate = {x : point.clientX - this.origin.x , y : point.clientY - this.origin.y}
+	/*	
+		console.log(this.scroll);*/
+	/*	console.log(translate.x);
+		console.log(this.pointZero);*/
+ /* 	console.error((this.currentTranslate - translate.x));
+
+		this.transalteSlide(this.currentTranslate - translate.x)
+		
+
+	}
+
+
+
+}*/

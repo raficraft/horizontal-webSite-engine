@@ -123,6 +123,15 @@ h1{
   margin-bottom: 1rem;
 }
 
+
+.slide-container{
+  width : 100%;
+  display: flex;
+  position: relative;
+  height: 100vh;
+  overflow-x: hidden;
+}
+
 .horizontal-scroll-wrapper {
   position : fixed;
   width : 100%;
@@ -137,6 +146,7 @@ h1{
   left : 0;
   background-color: #d8fcaf;
   min-width: 100vw;
+  min-height: 100vh;
 }
 
 .horizontal-scroll-wrapper .slide:nth-child(2){
