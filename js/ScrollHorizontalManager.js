@@ -48,12 +48,13 @@ class ScrollHorizontalManager{
 			this.linkCollection[0].classList.add(`active`) 
 		}
 
+		this.slideView = 1
+
 		console.log(this);
 
 		this.drawSliderPage()
 		this.keyBoardControl()
-
-
+		this.slider()
 
 	}
 
@@ -64,7 +65,12 @@ class ScrollHorizontalManager{
 		//presence of a header
 		//presence of a footer
 
-		const { nbSlide,container, linkCollection } = this	
+		const {linkCollection } = this	
+
+		this.slideView = parseInt(Math.round(100 / this.params.slideWidth))
+
+		console.log(100 / this.params.slideWidth);
+		console.error(this.slideView);
 
 		//get number of slide view to add
 
@@ -98,9 +104,9 @@ class ScrollHorizontalManager{
 
 		//Associate anchor link with slide ID
 		if(this.params.slideLink === true){
-			for (const key in linkCollection) {
-				if (Object.hasOwnProperty.call(linkCollection, key)) {
-					const link = linkCollection[key];
+			for (const key in this.linkCollection) {
+				if (Object.hasOwnProperty.call(this.linkCollection, key)) {
+					const link = this.linkCollection[key];
 
 					link.setAttribute('href',`${this.params.sliderName}_${parseInt(key) + this.offset}`)					
 					
@@ -112,7 +118,6 @@ class ScrollHorizontalManager{
 		setTimeout(()=>{
 			this.enabledTransition()
 		},0)
-		this.spy()
 	
 	}
 
@@ -124,8 +129,9 @@ class ScrollHorizontalManager{
 		}
 
 		const addSlide = parseInt(Math.round(100 / this.params.slideWidth))
+		
 		console.log(typeof(addSlide));
-		this.offset = Math.round(addSlide * 1)
+		this.offset = Math.round(addSlide * 2)		
 		if(addSlide >= this.nbSlide - 1){
 			alert(
 				`Vous essayez d'afficher plus ou autant de slide qu'il y en à dans la vue. La tolérance étant le nombre de slide - 1. Merci de rectifier le paramètres slideWidth à une dimension supérieur`
@@ -158,134 +164,91 @@ class ScrollHorizontalManager{
 
 	}
 
-	/*Nav with link NAV */
-	slideLink(){
+	slider(){
 
-		this.linkCollection.forEach(link => {
+		window.addEventListener('mousewheel', this.debounce(function(e) {		
 
-			link.addEventListener('click', (e)=>{
+			if(e.deltaY > 0 ){
 
-				e.preventDefault()
 
-				const target = e.target
-				const splitHref = target.getAttribute('href').split('_')
-				this.params.currentSlide = parseInt(splitHref[1])
-				this.goToSlide(this.params.currentSlide)
-
-				this.linkToggleClass(this.params.currentSlide)
-
-			})
+				this.goToPrev()
 			
-		});
 
+			}else if(e.deltaY < 0){
+
+				this.goToNext()
+			
+			}
+
+		},100).bind(this))
 	}
-
 
 	keyBoardControl(){
 
-		window.addEventListener('keyup',e =>{
-
-			const slideLimit = this.nbSlide - this.offset -1
+		window.addEventListener('keyup', e =>{
 
 			if(e.key === 'ArrowRight' || e.key === 'Right'){
-				const newIdx = this.params.currentSlide + 1
-			//	console.log(newIdx);
 
-				if(newIdx <= slideLimit){
-					this.goToSlide(newIdx)
-					this.params.currentSlide = newIdx
-				}
-				
-			 if(this.params.infiniteLoop === true){
-
-					//if limit let's go to 0
-
-					if(newIdx > slideLimit){
-					this.disabledTransition()
-					this.goToSlide(0)
-					this.params.currentSlide = 0
-					setTimeout(()=>{
-						this.enabledTransition()
-						this.goToSlide(this.offset)
-						this.params.currentSlide = this.offset
-					},0)
-				
-					}
-
-				}
-
-
-				//On Work !!!
-			
-				let linkActiveIdx = this.params.currentSlide	
-				if(linkActiveIdx <= 0 && this.params.infiniteLoop === true){
-					linkActiveIdx = this.offset
-				}
-
-				this.linkToggleClass(linkActiveIdx)
-
-			
-
-
+				this.goToPrev()
 
 			}else if(e.key === 'ArrowLeft' || e.key === 'Left'){
 
-				console.log('key');
-
-				const newIdx = this.params.currentSlide - 1
-
-				
-				
-				console.error(newIdx);	
-
-					if(newIdx >= 0){
-						this.goToSlide(newIdx)
-						this.params.currentSlide = newIdx
-					}
-					
-				if(this.params.infiniteLoop === true){
-
-					console.log(newIdx);
-					console.log(slideLimit);
-					if(newIdx < 0){
-
-						console.log('youpi');
-
-						this.disabledTransition()
-						this.goToSlide(this.nbSlide - 2)
-						this.params.currentSlide = this.nbSlide - 2
-						
-						setTimeout(()=>{
-							this.enabledTransition()
-							this.goToSlide(this.params.currentSlide-1)
-							this.params.currentSlide = this.params.currentSlide -1
-						},0)
-					
-						}
-
-				}
-
-				let linkActiveIdx = this.params.currentSlide	
-				if(linkActiveIdx <= 0 && this.params.infiniteLoop === true){
-					linkActiveIdx = this.offset
-				}
-
-				this.linkToggleClass(linkActiveIdx)
-
+				this.goToNext()
 
 			}
+
 		})
+
+	}
+
+		/*Nav with link NAV */
+		slideLink(){
+
+			this.linkCollection.forEach(link => {
+	
+				link.addEventListener('click', (e)=>{
+	
+					e.preventDefault()
+	
+					const target = e.target
+					const splitHref = target.getAttribute('href').split('_')
+					this.params.currentSlide = parseInt(splitHref[1])
+					if(this.params.jumpLink === false){
+						this.goToSlide(this.params.currentSlide)
+					}else{
+						this.jumpToSlide(this.params.currentSlide)
+					}
+	
+					this.linkToggleClass(this.params.currentSlide)
+	
+				})
+				
+			});
+	
+		}
+	
+
+	jumpToSlide(idx){
+
+		this.disabledTransition()
+		const value = idx * this.params.slideWidth			
+		this.scrollContainer.style.transform = `translate(-${value}vw)`	
+		setTimeout(()=>{			
+			this.enabledTransition()
+		},100)
 
 	}
 
 	goToSlide(idx){
 
-		const value = idx * this.params.slideWidth
-		this.scrollContainer.style.transform = `translate(-${value}vw)`
-		this.spy()
+		console.log('go To :' , idx);
+
+		const value = idx * this.params.slideWidth			
+		this.scrollContainer.style.transform = `translate(-${value}vw)`	
+		this.params.currentSlide = idx
+		this.linkToggleClass(idx)
 
 	}
-
 
 	linkToggleClass(idx){
 
@@ -295,22 +258,73 @@ class ScrollHorizontalManager{
 
 	}
 
-
-
-	spy(){
-		/*
-		console.log('############################################');
-		console.log(this.params);
-		console.log(this);*/
-	}
-
-
 	disabledTransition(){
 		this.scrollContainer.style.transitionDuration = "0s"
 	}
 
 	enabledTransition(){
 		this.scrollContainer.style.transitionDuration = `${this.params.slideTransition}s`
+	}
+
+	goToNext(){
+
+		const idxEnd = this.nbSlide - 1 //extrémité du slide ajouté
+
+		const idxLimitStart = this.offset //Début du slide
+		const idxLimitEnd = idxEnd - this.offset // fin du slide
+
+
+		const newScroll = this.params.currentSlide - 1
+
+		if(this.params.infiniteLoop === false){
+
+			if(newScroll >= idxLimitStart){
+			this.goToSlide(newScroll)
+			}
+
+
+
+		}else if (this.params.infiniteLoop === true){
+
+			if(newScroll >= idxLimitStart){
+				this.goToSlide(newScroll)
+			}else{
+
+				this.jumpToSlide(idxEnd -1 )
+				setTimeout(()=>{
+					this.goToSlide(idxLimitEnd)
+				},100)
+			}
+
+		}	
+
+	}
+
+	goToPrev(){
+
+		const idxEnd = this.nbSlide - 1 //extrémité du slide ajouté
+		const idxLimitEnd = idxEnd - this.offset // fin du slide
+
+		const newScroll = this.params.currentSlide + 1
+
+		if(this.params.infiniteLoop === false){
+
+			if(newScroll<= idxLimitEnd){
+				this.goToSlide(newScroll)
+			}
+
+		}else if (this.params.infiniteLoop === true){
+
+			if(newScroll<= idxLimitEnd){
+				this.goToSlide(newScroll)
+			}else{
+				this.jumpToSlide(this.offset - 1)
+				setTimeout(()=>{
+					this.goToSlide(this.offset)
+				},100)
+			}
+		}
+
 	}
 
 

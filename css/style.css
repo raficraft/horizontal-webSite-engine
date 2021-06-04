@@ -136,7 +136,7 @@ h1{
   position : absolute;
   width : 100%;
   display: flex;
-  
+  background-color: red;
   overflow: hidden;
 }
 
