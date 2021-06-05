@@ -129,6 +129,7 @@ h1{
   display: flex;
   position: relative;
   height: 100vh;
+  
 }
 
 .horizontal-scroll-wrapper {
@@ -149,6 +150,7 @@ h1{
   background-color: #d8fcaf;
   min-width: 100vw;
   min-height: 100vh;
+
 }
 
 .horizontal-scroll-wrapper .slide:nth-child(2n){

@@ -52,9 +52,8 @@ class ScrollHorizontalManager{
 
 	 this.slideView = 1
 
-	 console.log(this);
-
 	 this.drawSliderPage()
+	 this.resizeSlider()
 	 this.keyBoardControl()
 	 this.slider()
 	 this.manageDrag()
@@ -63,314 +62,303 @@ class ScrollHorizontalManager{
 
  //ENGINE
 
- drawSliderPage(){
-
-	 //presence of a header
-	 //presence of a footer
-
-	 const {linkCollection } = this	
-
-	 this.slideView = parseInt(Math.round(100 / this.params.slideWidth))
-
-	 console.log(100 / this.params.slideWidth);
-	 console.error(this.slideView);
+	drawSliderPage(){
+
+		//presence of a header
+		//presence of a footer
 
-	 //get number of slide view to add
-
-	 if(this.params.infiniteLoop === true){
-		 this.infiniteLoop()
-	 }	
+		const {linkCollection } = this	
 
-	 //Define width of parent container of slide
-	 this.widthContainer = `${(this.nbSlide * this.params.slideWidth)}vw `		
-	 this.scrollContainer.style.width = this.widthContainer 
-	 this.scrollContainer.style.transitionDuration = `0s`
+		this.slideView = parseInt(Math.round(100 / this.params.slideWidth))
 
-	 //Define width && id of Slide && inject this to the parent container
+		//get number of slide view to add
 
-	 console.error(this.nbSlide);
+		if(this.params.infiniteLoop === true){
+			this.infiniteLoop()
+		}	
 
-	 for (const key in this.slideCollection) {
-		 if (Object.hasOwnProperty.call(this.slideCollection, key)) {
+		//Define width of parent container of slide
+		this.widthContainer = `${(this.nbSlide * this.params.slideWidth)}vw `		
+		this.scrollContainer.style.width = this.widthContainer 
+		this.scrollContainer.style.transitionDuration = `0s`
 
-			 const slideItem = this.slideCollection[key];
-			 slideItem.style.minWidth = `${this.params.slideWidth}vw`
-			 slideItem.setAttribute('id',`${this.params.sliderName}_${key}`)	
-			 
-			 //Resize lastSlide if infiniteLoop = false
-			 if(parseInt(key) === parseInt(this.nbSlide) - 1 && this.params.infiniteLoop === false && this.params.slideWidth < 100){
-				 slideItem.style.minWidth = `100vw`
-			 }
-			 
-		 }
-	 }
+		//Define width && id of Slide && inject this to the parent container
 
-	 //Associate anchor link with slide ID
-	 if(this.params.slideLink === true){
-		 for (const key in this.linkCollection) {
-			 if (Object.hasOwnProperty.call(this.linkCollection, key)) {
-				 const link = this.linkCollection[key];
+		for (const key in this.slideCollection) {
+			if (Object.hasOwnProperty.call(this.slideCollection, key)) {
 
-				 link.setAttribute('href',`${this.params.sliderName}_${parseInt(key) + this.offset}`)					
-				 
-			 }
-		 }
-	 }
+				const slideItem = this.slideCollection[key];
+				slideItem.style.minWidth = `${this.params.slideWidth}vw`
+				slideItem.setAttribute('id',`${this.params.sliderName}_${key}`)	
+				
+				//Resize lastSlide if infiniteLoop = false
+				if(parseInt(key) === parseInt(this.nbSlide) - 1 && this.params.infiniteLoop === false && this.params.slideWidth < 100){
+					slideItem.style.minWidth = `100vw`
+				}
+				
+			}
+		}
 
-	 this.goToSlide(this.params.currentSlide)
-	 setTimeout(()=>{
-		 this.enabledTransition()
-	 },0)
- 
- }
+		//Associate anchor link with slide ID
+		if(this.params.slideLink === true){
+			for (const key in this.linkCollection) {
+				if (Object.hasOwnProperty.call(this.linkCollection, key)) {
+					const link = this.linkCollection[key];
 
- infiniteLoop(){
+					link.setAttribute('href',`${this.params.sliderName}_${parseInt(key) + this.offset}`)					
+					
+				}
+			}
+		}
 
-	 //Remove old original HTML contenant
-	 for (const item of this.slideCollection) {	
-		 item.remove()			
-	 }
+		this.goToSlide(this.params.currentSlide)
+		setTimeout(()=>{
+			this.enabledTransition()
+		},0)
 
-	 const addSlide = parseInt(Math.round(100 / this.params.slideWidth))
-	 
-	 console.log(typeof(addSlide));
-	 this.offset = Math.round(addSlide * 2)		
-	 if(addSlide >= this.nbSlide - 1){
-		 alert(
-			 `Vous essayez d'afficher plus ou autant de slide qu'il y en à dans la vue. La tolérance étant le nombre de slide - 1. Merci de rectifier le paramètres slideWidth à une dimension supérieur`
-		 )
-	 }
+	}
 
-	 //DrawSlider
+	infiniteLoop(){
 
-	 let slideCollection = [...this.slideCollection];
-	 
-	 this.slideCollection = [
-		 ...slideCollection.slice(this.nbSlide - this.offset).map(item => item.cloneNode(true)),
-		 ...slideCollection,
-		 ...slideCollection.slice(0, this.offset).map(item => item.cloneNode(true))
-	 ]
+		//Remove old original HTML contenant
+		for (const item of this.slideCollection) {	
+			item.remove()			
+		}
 
-	 //redefinition of the number of slides
-	 this.nbSlide = this.slideCollection.length		
+		const addSlide = parseInt(Math.round(100 / this.params.slideWidth))
+		
+		this.offset = Math.round(addSlide * 2)		
+		if(addSlide >= this.nbSlide - 1){
+			alert(
+				`Vous essayez d'afficher plus ou autant de slide qu'il y en à dans la vue. La tolérance étant le nombre de slide - 1. Merci de rectifier le paramètres slideWidth à une dimension supérieur`
+			)
+		}
 
-	 //Define number of first slide view onload {curentSlide}
-	 this.params.currentSlide = this.offset		
+		//DrawSlider
 
-	 //Inject new Slider construct in this.scrollContainer
-	 for (const key in this.slideCollection) {
-		 if (Object.hasOwnProperty.call(this.slideCollection, key)) {
-			 const slideItem = this.slideCollection[key];	
-			 this.scrollContainer.insertAdjacentElement('beforeend',slideItem)					
-		 }
-	 }
+		let slideCollection = [...this.slideCollection];
+		
+		this.slideCollection = [
+			...slideCollection.slice(this.nbSlide - this.offset).map(item => item.cloneNode(true)),
+			...slideCollection,
+			...slideCollection.slice(0, this.offset).map(item => item.cloneNode(true))
+		]
 
- }
+		//redefinition of the number of slides
+		this.nbSlide = this.slideCollection.length		
 
- slider(){
+		//Define number of first slide view onload {curentSlide}
+		this.params.currentSlide = this.offset		
 
-	 window.addEventListener('mousewheel', this.debounce(function(e) {		
+		//Inject new Slider construct in this.scrollContainer
+		for (const key in this.slideCollection) {
+			if (Object.hasOwnProperty.call(this.slideCollection, key)) {
+				const slideItem = this.slideCollection[key];	
+				this.scrollContainer.insertAdjacentElement('beforeend',slideItem)					
+			}
+		}
 
-		 if(e.deltaY > 0 ){
+	}
 
+	slider(){
 
-			 this.goToPrev()
-		 
+		window.addEventListener('mousewheel', this.debounce(function(e) {		
 
-		 }else if(e.deltaY < 0){
+			if(e.deltaY > 0 ){
 
-			 this.goToNext()
-		 
-		 }
 
-	 },100).bind(this))
- }
+				this.goToPrev()
+			
 
- keyBoardControl(){
+			}else if(e.deltaY < 0){
 
-	 window.addEventListener('keyup', e =>{
+				this.goToNext()
+			
+			}
 
-		 if(e.key === 'ArrowRight' || e.key === 'Right'){
+		},100).bind(this))
+	}
 
-			 this.goToPrev()
+	keyBoardControl(){
 
-		 }else if(e.key === 'ArrowLeft' || e.key === 'Left'){
+	window.addEventListener('keyup', e =>{
 
-			 this.goToNext()
+		if(e.key === 'ArrowRight' || e.key === 'Right'){
 
-		 }
+			this.goToPrev()
 
-	 })
+		}else if(e.key === 'ArrowLeft' || e.key === 'Left'){
 
- }
+			this.goToNext()
 
-	 /*Nav with link NAV */
-	 slideLink(){
+		}
 
-		 this.linkCollection.forEach(link => {
- 
-			 link.addEventListener('click', (e)=>{
- 
-				 e.preventDefault()
- 
-				 const target = e.target
-				 const splitHref = target.getAttribute('href').split('_')
-				 this.params.currentSlide = parseInt(splitHref[1])
-				 if(this.params.jumpLink === false){
-					 this.goToSlide(this.params.currentSlide)
-				 }else{
-					 this.jumpToSlide(this.params.currentSlide)
-				 }
- 
-				 this.linkToggleClass(this.params.currentSlide)
- 
-			 })
-			 
-		 });
- 
-	 }
- 
+	})
 
- jumpToSlide(idx){
+	}
 
-	 this.disabledTransition()
-	 const value = idx * this.params.slideWidth			
-	 this.scrollContainer.style.transform = `translate3d(-${value}vw,0,0)`	
-	 setTimeout(()=>{			
-		 this.enabledTransition()
-	 },100)
+	/*Nav with link NAV */
+	slideLink(){
 
- }
+	this.linkCollection.forEach(link => {
 
- goToSlide(idx){
+	link.addEventListener('click', (e)=>{
 
-	 console.log('go To :' , idx);
+		e.preventDefault()
 
-	 const value = idx * this.params.slideWidth			
-	 this.scrollContainer.style.transform = `translate3d(-${value}vw,0,0)`	
-	 this.params.currentSlide = idx
-	 console.log('new' , this.params.currentSlide);
-	 this.linkToggleClass(idx)
+		const target = e.target
+		const splitHref = target.getAttribute('href').split('_')
+		this.params.currentSlide = parseInt(splitHref[1])
+		if(this.params.jumpLink === false){
+			this.goToSlide(this.params.currentSlide)
+		}else{
+			this.jumpToSlide(this.params.currentSlide)
+		}
 
- }
+		this.linkToggleClass(this.params.currentSlide)
 
- linkToggleClass(idx){
+	})
 
-	 document.querySelector('.active').classList.remove('active')		
-	 const thisLinkActive = document.querySelector(`[href=${this.params.sliderName}_${idx}]`)
-	 thisLinkActive.classList.add('active')
+	});
 
- }
+	} 
 
- disabledTransition(){
-	 this.scrollContainer.style.transitionDuration = "0s"
- }
+	jumpToSlide(idx){
 
- enabledTransition(){
-	 this.scrollContainer.style.transitionDuration = `${this.params.slideTransition}s`
- }
+	this.disabledTransition()
+	const value = idx * this.params.slideWidth			
+	this.scrollContainer.style.transform = `translate3d(-${value}vw,0,0)`	
+	setTimeout(()=>{			
+		this.enabledTransition()
+	},100)
 
- goToNext(){
+	}
 
-	 const idxEnd = this.nbSlide - 1 //extrémité du slide ajouté
+	goToSlide(idx){
 
-	 const idxLimitStart = this.offset //Début du slide
-	 const idxLimitEnd = idxEnd - this.offset // fin du slide
 
+	const value = idx * this.params.slideWidth			
+	this.scrollContainer.style.transform = `translate3d(-${value}vw,0,0)`	
+	this.params.currentSlide = idx
+	this.linkToggleClass(idx)
 
-	 const newScroll = this.params.currentSlide - 1
+	}
 
-	 if(this.params.infiniteLoop === false){
+	linkToggleClass(idx){
 
-		 if(newScroll >= idxLimitStart){
-		 this.goToSlide(newScroll)
-		 }
+	document.querySelector('.active').classList.remove('active')		
+	const thisLinkActive = document.querySelector(`[href=${this.params.sliderName}_${idx}]`)
+	thisLinkActive.classList.add('active')
 
+	}
 
+	disabledTransition(){
+	this.scrollContainer.style.transitionDuration = "0s"
+	}
 
-	 }else if (this.params.infiniteLoop === true){
+	enabledTransition(){
+	this.scrollContainer.style.transitionDuration = `${this.params.slideTransition}s`
+	}
 
-		 if(newScroll >= idxLimitStart){
-			 this.goToSlide(newScroll)
-		 }else{
+	goToNext(){
 
-			 this.jumpToSlide(idxEnd -1 )
-			 setTimeout(()=>{
-				 this.goToSlide(idxLimitEnd)
-			 },100)
-		 }
+	const idxEnd = this.nbSlide - 1 //extrémité du slide ajouté
 
-	 }	
+	const idxLimitStart = this.offset //Début du slide
+	const idxLimitEnd = idxEnd - this.offset // fin du slide
 
- }
 
- goToPrev(){
+	const newScroll = this.params.currentSlide - 1
 
-	 const idxEnd = this.nbSlide - 1 //extrémité du slide ajouté
-	 const idxLimitEnd = idxEnd - this.offset // fin du slide
+	if(this.params.infiniteLoop === false){
 
-	 const newScroll = this.params.currentSlide + 1
+		if(newScroll >= idxLimitStart){
+		this.goToSlide(newScroll)
+		}
 
-	 if(this.params.infiniteLoop === false){
 
-		 if(newScroll<= idxLimitEnd){
-			 this.goToSlide(newScroll)
-		 }
 
-	 }else if (this.params.infiniteLoop === true){
+	}else if (this.params.infiniteLoop === true){
 
-		 if(newScroll<= idxLimitEnd){
-			 this.goToSlide(newScroll)
-		 }else{
-			 this.jumpToSlide(this.offset - 1)
-			 setTimeout(()=>{
-				 this.goToSlide(this.offset)
-			 },100)
-		 }
-	 }
+		if(newScroll >= idxLimitStart){
+			this.goToSlide(newScroll)
+		}else{
 
- }
+			this.jumpToSlide(idxEnd -1 )
+			setTimeout(()=>{
+				this.goToSlide(idxLimitEnd)
+			},100)
+		}
 
+	}	
 
- debounce(callback,delay){
+	}
 
-	 let timer;
-	 return function(){
-			 let args = arguments;
-			 let context = this;
-			 clearTimeout(timer);
-			 timer = setTimeout(function(){
-					 callback.apply(context, args);
-			 }, delay)
-	 }
+	goToPrev(){
 
- }
+	const idxEnd = this.nbSlide - 1 //extrémité du slide ajouté
+	const idxLimitEnd = idxEnd - this.offset // fin du slide
 
- 
-manageDrag(){
+	const newScroll = this.params.currentSlide + 1
+
+	if(this.params.infiniteLoop === false){
+
+		if(newScroll<= idxLimitEnd){
+			this.goToSlide(newScroll)
+		}
+
+	}else if (this.params.infiniteLoop === true){
+
+		if(newScroll<= idxLimitEnd){
+			this.goToSlide(newScroll)
+		}else{
+			this.jumpToSlide(this.offset - 1)
+			setTimeout(()=>{
+				this.goToSlide(this.offset)
+			},100)
+		}
+	}
+
+	}
+
+	debounce(callback,delay){
+
+	let timer;
+	return function(){
+			let args = arguments;
+			let context = this;
+			clearTimeout(timer);
+			timer = setTimeout(function(){
+					callback.apply(context, args);
+			}, delay)
+	}
+
+	}
+
+	manageDrag(){
 
 	this.scrollContainer.addEventListener('dragstart', e => e.preventDefault() )
-  this.scrollContainer.addEventListener('mousedown', e => 	this.startDrag(e) )
-  this.scrollContainer.addEventListener('touchstart',e => 	this.startDrag(e)	)
-  window.addEventListener('mousemove' , e => 	this.drag(e) )
-  window.addEventListener('touchmove' , e => 	this.drag(e) )
-  window.addEventListener('mouseup' , e => 	this.endDrag(e)	)
-  window.addEventListener('touchend' , e => 	this.endDrag(e)	)
-  window.addEventListener('touchcancel' , e => 	this.endDrag(e)	)
+	this.scrollContainer.addEventListener('mousedown', e => 	this.startDrag(e) )
+	this.scrollContainer.addEventListener('touchstart',e => 	this.startDrag(e)	)
+	window.addEventListener('mousemove' , e => 	this.drag(e) )
+	window.addEventListener('touchmove' , e => 	this.drag(e) )
+	window.addEventListener('mouseup' , e => 	this.endDrag(e)	)
+	window.addEventListener('touchend' , e => 	this.endDrag(e)	)
+	window.addEventListener('touchcancel' , e => 	this.endDrag(e)	)
 
-}
+	}
 
-/**
- * Démarre le déplacement au touché
- * @param {MouseEvent|TouchEvent} e 
- */
+	/**
+	 * Démarre le déplacement au touché
+	 * @param {MouseEvent|TouchEvent} e 
+	 */
 
-startDrag(e){
-  if(e.touches) {  if(e.touches.length > 1){ return   }else{ e = e.touches[0] } }
-  this.origin = {x : e.screenX, y : e.screenY}
-  this.width = this.containerWidth
-  this.disabledTransition()
-}
+	startDrag(e){
+	if(e.touches) {  if(e.touches.length > 1){ return   }else{ e = e.touches[0] } }
+	this.origin = {x : e.screenX, y : e.screenY}
+	this.width = this.containerWidth
+	this.disabledTransition()
+	}
 
 /**
  * 
@@ -435,12 +423,40 @@ translate(value){
 //	console.log('on translate de ' , value+'vw');
 	this.scrollContainer.style.transform = `translate3d(${value}vw , 0, 0)`
 }
+
+resizeSlider(){
+		this.pushUpResize = false
+		this.pushDownResize = false
+		
+
+
+		if(this.params.pushUp !== false && typeof(this.params.pushUp) === 'string'){
+
+			const pushUpEl = document.querySelector(`${this.params.pushUp}`)
+			this.pushUpVal = pushUpEl.offsetHeight 
+			this.slideWrapper.style.top = `${this.pushUpVal}px`
+			this.pushUpResize = true
+
+		}		
+
+		if(this.params.pushDown !== false && typeof(this.params.pushDown) === 'string'){
+
+			console.log(`${this.params.pushDown}`);
+
+			const pushDownEl = document.querySelector(`${this.params.pushDown}`)
+			this.pushDownVal = pushDownEl.offsetHeight 
+			this.slideWrapper.style.bottom = `${this.pushUpVal}px`
+			this.pushDownResize = true
+
+		}
+}
+
 }
 
 
 const horizontalScroll = new ScrollHorizontalManager({
 
-
+pushUp  : '.headerTop'
 
 
 
