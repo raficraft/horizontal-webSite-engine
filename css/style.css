@@ -97,6 +97,10 @@ footer{
 
 .socialIcon{
   display: flex;
+  background-color: white;
+  border-radius: 3px;  
+  border : 2px solid rgb(191, 191, 191);
+  box-shadow: 2px 2px 2px 1px rgba(61, 61, 61, 0.2); ;
 }
 
 .socialIcon a{
@@ -104,6 +108,11 @@ footer{
   height : 2rem;
   width: 2rem;
   margin : 1rem;
+  transition: 0.3s;
+}
+
+.socialIcon a:hover{
+  transform : scale(1.2)
 }
 
 
@@ -175,3 +184,112 @@ h1{
 .active{
   background-color: rgb(134, 134, 134);
 }
+
+:root{
+
+  --size-arrowrapper : 50px;
+  --size-arrow : 20%;
+  --rotate-arrow : 45deg;
+  --rotate-arrow2 : -45deg;
+
+}
+
+
+[data-hsprev],[data-hsnext]{
+
+  position: fixed;
+  content : '';
+  width : var(--size-arrowrapper);
+  height: var(--size-arrowrapper);
+  top : 0;
+  background-color: white;
+  border-radius: 50%;
+  z-index: 100;
+  top : calc(50vh - (var(--size-arrowrapper) / 2 ));  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  cursor : pointer;  
+  border : 2px solid rgb(191, 191, 191);
+  box-shadow: 2px 2px 2px 1px rgba(61, 61, 61, 0.2); ;
+  transition: 0.3s;
+
+}
+
+
+
+[data-hsnext]{
+  right : 1rem;
+  box-shadow: 2px 2px 2px 1px rgba(61, 61, 61, 0.2); ;
+}
+
+[data-hsprev]{
+  left  : 1rem;
+  box-shadow: 2px 2px 2px 1px rgba(61, 61, 61, 0.2); ;
+}
+
+
+
+[data-hsprev]::before,[data-hsprev]::after{
+
+  position: absolute;
+  content : '';
+  width : calc(100% / 2);
+  height: var(--size-arrow);
+  border-radius: 0 3px 3px 0px; 
+}
+
+[data-hsprev]::before{
+  background-color: rgba(150, 150, 150,0.9);
+  transform-origin: bottom left;
+  transform: rotate(var(--rotate-arrow));
+  top : calc(50% - (40% / 2));
+  left : 20%;
+}
+
+[data-hsprev]::after{
+  background-color: rgba(79, 79, 79, 0.9);
+  transform-origin: top left;
+  transform: rotate(var(--rotate-arrow2)) ;
+  top : calc(50% - (0% / 2));
+  left : 20%;
+  
+}
+
+
+[data-hsnext]::before,[data-hsnext]::after{
+
+  position: absolute;
+  content : '';
+  width : calc(100% / 2);
+  height: var(--size-arrow);
+  z-index: 100;
+  border-radius: 3px 0px 0px 3px; 
+}
+
+
+[data-hsnext]::before{
+  background-color: rgba(79, 79, 79,0.9);
+  transform-origin: bottom right;
+  transform: rotate(var(--rotate-arrow));
+  top : calc(50% - (10% / 2));
+  left : 16%;
+  z-index: 105;
+}
+
+[data-hsnext]::after{
+  background-color: rgba(150, 150, 150,0.9);
+  transform-origin: top right;
+  transform: rotate(var(--rotate-arrow2)) ;
+  top : calc(50% - (27% / 2));
+  left : 16%;
+  z-index : 102
+  
+}
+
+
+[data-hsprev]:hover,[data-hsnext]:hover{
+  transform : scale(1.2)
+}
+

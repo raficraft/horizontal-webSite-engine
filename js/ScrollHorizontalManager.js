@@ -55,6 +55,24 @@ class ScrollHorizontalManager{
 				this.linkCollection[0].classList.add(`active`) 
 			}
 
+
+			if(document.querySelector(`[data-${this.params.sliderName}prev]`) && document.querySelector(`[data-${this.params.sliderName}next]`)){
+
+				this.buttonPrev = document.querySelector(`[data-${this.params.sliderName}prev]`)
+				this.buttonNext = document.querySelector(`[data-${this.params.sliderName}next]`)
+
+				this.buttonPrev.addEventListener('click' , e => {
+
+					this.goToPrev()
+				})
+				this.buttonNext.addEventListener('click' , e => {
+
+					this.goToNext()
+				})
+
+
+			}
+
 			this.slideView = 1
 
 			this.drawSliderPage()
@@ -156,6 +174,9 @@ class ScrollHorizontalManager{
 			...slideCollection,
 			...slideCollection.slice(0, this.offset).map(item => item.cloneNode(true))
 		]
+
+
+		console.log(this.slideCollection);
 
 		//redefinition of the number of slides
 		this.nbSlide = this.slideCollection.length		
@@ -337,14 +358,20 @@ class ScrollHorizontalManager{
 
 	}
 
+	/**
+	 * drad on touchScreen Mobil
+	 */
+
 	manageDrag(){
 
-		this.scrollContainer.addEventListener('dragstart', e => e.preventDefault() )
+		/*
 		this.scrollContainer.addEventListener('mousedown', e => 	this.startDrag(e) )
-		this.scrollContainer.addEventListener('touchstart',e => 	this.startDrag(e)	)
 		window.addEventListener('mousemove' , e => 	this.drag(e) )
-		window.addEventListener('touchmove' , e => 	this.drag(e) )
 		window.addEventListener('mouseup' , e => 	this.endDrag(e)	)
+		*/
+		this.scrollContainer.addEventListener('dragstart', e => e.preventDefault() )
+		this.scrollContainer.addEventListener('touchstart',e => 	this.startDrag(e)	)
+		window.addEventListener('touchmove' , e => 	this.drag(e) )
 		window.addEventListener('touchend' , e => 	this.endDrag(e)	)
 		window.addEventListener('touchcancel' , e => 	this.endDrag(e)	)
 
@@ -468,3 +495,5 @@ pushUp  : '.headerTop'
 // avec le drag , le slide de fin revient sur le dernier puis slide sur le premier créer une
 // méthode goToposition (this.translate - sliderWidth * nbSlide - 2 * this.offset)
 // this.reallyNbSlide = nbSlide - 2 * this.offset
+
+//Tenter de selectine les liens via le parent [].slice.call(parent)
