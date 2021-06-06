@@ -11,54 +11,61 @@ class ScrollHorizontalManager{
 	* @param {HTMLElement} [pushUp] Recalcule la hauteur du slide en fonction du 
 	*/
 
- constructor(params = {}){	
- 
-	 this.params = Object.assign({},{		
+		constructor(params = {}){	
 
-		 slideXWithMouseWheel : true,
-		 sliderName : 'hs',
-		 currentSlide : 0,
+			this.params = Object.assign({},{		
 
-		 infiniteLoop : true,
+				slideXWithMouseWheel : false,
+				sliderName : 'hs',
+				currentSlide : 0,
 
-		 slideWidth : 95,
-		 slideTransition : '0.3',
-		 slideLink : true,
-		 jumpLink : false,			
+				infiniteLoop : true,
 
-		 pushUp : false,
-		 puhsDown : false,
+				slideWidth : 95,
+				slideTransition : '0.3',
+				slideLink : true,
+				jumpLink : false,			
 
-		 linkClassName :  'linkSlideHorizontal'
+				pushUp : false,
+				puhsDown : false,
 
-	 },params)
+				linkClassName :  'linkSlideHorizontal'
+
+			},params)
 
 
-	 //get children el [].slice.call(element.children)
+			//get children el [].slice.call(element.children)
 
-	 this.slideWrapper = document.querySelector(`[data-${this.params.sliderName}]`)
-	 this.scrollContainer = document.querySelector(`[data-${this.params.sliderName}Container]`)
+			this.slideWrapper = document.querySelector(`[data-${this.params.sliderName}]`)
+			this.scrollContainer = document.querySelector(`[data-${this.params.sliderName}Container]`)			
 
-	 this.slideCollection = document.querySelectorAll(`[data-${this.params.sliderName}Slide]`)
-	 this.nbSlide = this.slideCollection.length
+			console.log([].slice.call(this.slideWrapper.children));
 
-	 this.offset = 0
+			this.slideCollection = [].slice.call(this.scrollContainer.children)
+			this.nbSlide = this.slideCollection.length
 
-	 if(this.params.slideLink === true){
-		 this.linkCollection = document.querySelectorAll(`[data-${this.params.sliderName}Link]`)
-		 this.slideLink()
-		 this.linkCollection[0].classList.add(`active`) 
-	 }
+			this.offset = 0
 
-	 this.slideView = 1
+			if(this.params.slideLink === true){
+				this.linkContainer = document.querySelector(`[data-${this.params.sliderName}nav]`)
+				console.log(this.linkContainer);
+				console.log();
+				this.linkCollection = document.querySelectorAll(`[data-${this.params.sliderName}Link]`)
+				this.slideLink()
+				this.linkCollection[0].classList.add(`active`) 
+			}
 
-	 this.drawSliderPage()
-	 this.resizeSlider()
-	 this.keyBoardControl()
-	 this.slider()
-	 this.manageDrag()
+			this.slideView = 1
 
- }
+			this.drawSliderPage()
+			this.resizeSlider()
+			this.keyBoardControl()
+			if(this.params.slideXWithMouseWheel === true){
+			this.slider()
+			}
+			this.manageDrag()
+
+		}
 
  //ENGINE
 
@@ -111,6 +118,12 @@ class ScrollHorizontalManager{
 			}
 		}
 
+		//defines the bounds of the visible slider and the constructed slider
+		this.idxStart = 0 //Start of the constructed slider
+		this.idxEnd = this.nbSlide - 1 //End of the constructed slider
+		this.idxLimitStart = this.offset //Start of slider visible
+		this.idxLimitEnd = this.idxEnd - this.offset //End of slider visible		
+
 		this.goToSlide(this.params.currentSlide)
 		setTimeout(()=>{
 			this.enabledTransition()
@@ -160,36 +173,34 @@ class ScrollHorizontalManager{
 
 	}
 
+	/**
+	 * Slide with wheel mouse
+	 */
+
 	slider(){
 
 		window.addEventListener('mousewheel', this.debounce(function(e) {		
 
-			if(e.deltaY > 0 ){
-
-
-				this.goToPrev()
-			
-
-			}else if(e.deltaY < 0){
-
-				this.goToNext()
-			
-			}
+			if(e.deltaY > 0 ){	this.goToNext()	}
+			else if(e.deltaY < 0){	this.goToPrev()	}
 
 		},100).bind(this))
 	}
 
+	/**
+	 * Use KeyBoard Arrow to slide
+	 */
 	keyBoardControl(){
 
 	window.addEventListener('keyup', e =>{
 
 		if(e.key === 'ArrowRight' || e.key === 'Right'){
 
-			this.goToPrev()
-
-		}else if(e.key === 'ArrowLeft' || e.key === 'Left'){
-
 			this.goToNext()
+			
+		}else if(e.key === 'ArrowLeft' || e.key === 'Left'){
+			
+			this.goToPrev()
 
 		}
 
@@ -223,98 +234,89 @@ class ScrollHorizontalManager{
 
 	} 
 
+	/**
+	 * Go directly to specific slide without animation
+	 * @param {number} idx 
+	 */
+
 	jumpToSlide(idx){
 
-	this.disabledTransition()
-	const value = idx * this.params.slideWidth			
-	this.scrollContainer.style.transform = `translate3d(-${value}vw,0,0)`	
-	setTimeout(()=>{			
-		this.enabledTransition()
-	},100)
+		this.disabledTransition()
+		const value = idx * this.params.slideWidth			
+		this.scrollContainer.style.transform = `translate3d(-${value}vw,0,0)`	
+		setTimeout(()=>{			
+			this.enabledTransition()
+		},100)
 
 	}
 
 	goToSlide(idx){
 
-
-	const value = idx * this.params.slideWidth			
-	this.scrollContainer.style.transform = `translate3d(-${value}vw,0,0)`	
-	this.params.currentSlide = idx
-	this.linkToggleClass(idx)
+		const value = idx * this.params.slideWidth			
+		this.scrollContainer.style.transform = `translate3d(-${value}vw,0,0)`	
+		this.params.currentSlide = idx
+		this.linkToggleClass(idx)
 
 	}
 
 	linkToggleClass(idx){
 
-	document.querySelector('.active').classList.remove('active')		
-	const thisLinkActive = document.querySelector(`[href=${this.params.sliderName}_${idx}]`)
-	thisLinkActive.classList.add('active')
+		document.querySelector('.active').classList.remove('active')		
+		const thisLinkActive = document.querySelector(`[href=${this.params.sliderName}_${idx}]`)
+		thisLinkActive.classList.add('active')
 
 	}
 
 	disabledTransition(){
-	this.scrollContainer.style.transitionDuration = "0s"
+		this.scrollContainer.style.transitionDuration = "0s"
 	}
 
 	enabledTransition(){
-	this.scrollContainer.style.transitionDuration = `${this.params.slideTransition}s`
-	}
-
-	goToNext(){
-
-	const idxEnd = this.nbSlide - 1 //extrémité du slide ajouté
-
-	const idxLimitStart = this.offset //Début du slide
-	const idxLimitEnd = idxEnd - this.offset // fin du slide
-
-
-	const newScroll = this.params.currentSlide - 1
-
-	if(this.params.infiniteLoop === false){
-
-		if(newScroll >= idxLimitStart){
-		this.goToSlide(newScroll)
-		}
-
-
-
-	}else if (this.params.infiniteLoop === true){
-
-		if(newScroll >= idxLimitStart){
-			this.goToSlide(newScroll)
-		}else{
-
-			this.jumpToSlide(idxEnd -1 )
-			setTimeout(()=>{
-				this.goToSlide(idxLimitEnd)
-			},100)
-		}
-
-	}	
-
+		this.scrollContainer.style.transitionDuration = `${this.params.slideTransition}s`
 	}
 
 	goToPrev(){
 
-	const idxEnd = this.nbSlide - 1 //extrémité du slide ajouté
-	const idxLimitEnd = idxEnd - this.offset // fin du slide
+		const newScroll = this.params.currentSlide - 1
+
+		if(this.params.infiniteLoop === false){
+
+			if(newScroll >= this.idxLimitStart){
+			this.goToSlide(newScroll)
+			}
+
+		}else if (this.params.infiniteLoop === true){
+
+			if(newScroll >= this.idxLimitStart){
+				this.goToSlide(newScroll)
+			}else{
+
+				this.jumpToSlide(this.idxEnd -1 )
+				setTimeout(()=>{
+					this.goToSlide(this.idxLimitEnd)
+				},100)
+			}
+		}	
+	}
+
+	goToNext(){
 
 	const newScroll = this.params.currentSlide + 1
 
 	if(this.params.infiniteLoop === false){
 
-		if(newScroll<= idxLimitEnd){
+		if(newScroll<= this.idxLimitEnd){
 			this.goToSlide(newScroll)
 		}
 
 	}else if (this.params.infiniteLoop === true){
 
-		if(newScroll<= idxLimitEnd){
+		if(newScroll<= this.idxLimitEnd){
 			this.goToSlide(newScroll)
 		}else{
-			this.jumpToSlide(this.offset - 1)
+			this.jumpToSlide(this.idxLimitStart - 1)
 			setTimeout(()=>{
-				this.goToSlide(this.offset)
+				this.goToSlide(this.idxLimitStart)
 			},100)
 		}
 	}
@@ -337,14 +339,14 @@ class ScrollHorizontalManager{
 
 	manageDrag(){
 
-	this.scrollContainer.addEventListener('dragstart', e => e.preventDefault() )
-	this.scrollContainer.addEventListener('mousedown', e => 	this.startDrag(e) )
-	this.scrollContainer.addEventListener('touchstart',e => 	this.startDrag(e)	)
-	window.addEventListener('mousemove' , e => 	this.drag(e) )
-	window.addEventListener('touchmove' , e => 	this.drag(e) )
-	window.addEventListener('mouseup' , e => 	this.endDrag(e)	)
-	window.addEventListener('touchend' , e => 	this.endDrag(e)	)
-	window.addEventListener('touchcancel' , e => 	this.endDrag(e)	)
+		this.scrollContainer.addEventListener('dragstart', e => e.preventDefault() )
+		this.scrollContainer.addEventListener('mousedown', e => 	this.startDrag(e) )
+		this.scrollContainer.addEventListener('touchstart',e => 	this.startDrag(e)	)
+		window.addEventListener('mousemove' , e => 	this.drag(e) )
+		window.addEventListener('touchmove' , e => 	this.drag(e) )
+		window.addEventListener('mouseup' , e => 	this.endDrag(e)	)
+		window.addEventListener('touchend' , e => 	this.endDrag(e)	)
+		window.addEventListener('touchcancel' , e => 	this.endDrag(e)	)
 
 	}
 
@@ -354,10 +356,10 @@ class ScrollHorizontalManager{
 	 */
 
 	startDrag(e){
-	if(e.touches) {  if(e.touches.length > 1){ return   }else{ e = e.touches[0] } }
-	this.origin = {x : e.screenX, y : e.screenY}
-	this.width = this.containerWidth
-	this.disabledTransition()
+		if(e.touches) {  if(e.touches.length > 1){ return   }else{ e = e.touches[0] } }
+		this.origin = {x : e.screenX, y : e.screenY}
+		this.width = this.containerWidth
+		this.disabledTransition()
 	}
 
 /**
@@ -370,7 +372,7 @@ drag(e){
 
     let point = e.touches ? e.touches[0] : e
     let translate = { x : point.screenX - this.origin.x, y : point.screenX - this.origin.y}		
-		if(e.touches && Math.abs(translat.x) > Math.abs(translate.y)){
+		if(e.touches && Math.abs(translate.x) > Math.abs(translate.y)){
 
 			e.preventDefault()
 			e.stopPropagation()
@@ -390,12 +392,13 @@ endDrag(e){
 		this.enabledTransition()
 
 		if(Math.abs(this.lastTranslate.x  / this.sliderOffsetWidth) > 0.2){
-			if(this.lastTranslate.x < 0 ){
-
-				this.goToPrev(this.params.currentSlide + 1)
-
-			}else{
-				this.goToNext(this.params.currentSlide - 1)
+			if(this.lastTranslate.x < 0 ){				
+				//Right slide start to end
+				this.goToNext(this.params.currentSlide + 1)
+				
+			}else{				
+				//Left slide start to end
+				this.goToPrev(this.params.currentSlide - 1)
 			}
 		}else{
 			this.goToSlide(this.params.curentSlide)
@@ -462,8 +465,6 @@ pushUp  : '.headerTop'
 
 })
 
-
-//Gérer le resize de l'écran // ok pour le moment {surement grace au css plutôt qu'au js à checker}
-//Tester toutes les options
-//Gérer les périph mobil // ok 05/06 13:49
-//resize header and footer presence
+// avec le drag , le slide de fin revient sur le dernier puis slide sur le premier créer une
+// méthode goToposition (this.translate - sliderWidth * nbSlide - 2 * this.offset)
+// this.reallyNbSlide = nbSlide - 2 * this.offset

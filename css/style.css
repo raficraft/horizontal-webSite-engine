@@ -124,13 +124,6 @@ h1{
 }
 
 
-.slide-container{
-  width : 100%;
-  display: flex;
-  position: relative;
-  height: 100vh;
-  
-}
 
 .horizontal-scroll-wrapper {
   overflow-x: hidden;
@@ -138,7 +131,13 @@ h1{
   width : 100%;
   display: flex;
   background-color: red;
-  overflow: hidden;
+  overflow-x: hidden;
+}
+
+
+.slide-container{
+  display: flex;
+  min-height: 100vh;
 }
 
 .horizontal-scroll-wrapper .slide{
@@ -146,7 +145,6 @@ h1{
   display: flex;
   justify-content: center;
   align-items: center;
-  left : 0;
   background-color: #d8fcaf;
   min-width: 100vw;
   min-height: 100vh;
