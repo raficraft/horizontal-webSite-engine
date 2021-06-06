@@ -97,10 +97,13 @@ footer{
 
 .socialIcon{
   display: flex;
+  justify-content: space-around;
   background-color: white;
   border-radius: 3px;  
   border : 2px solid rgb(191, 191, 191);
-  box-shadow: 2px 2px 2px 1px rgba(61, 61, 61, 0.2); ;
+  box-shadow: 2px 2px 2px 1px rgba(61, 61, 61, 0.2); 
+  min-width: 20%;
+
 }
 
 .socialIcon a{
@@ -146,7 +149,7 @@ h1{
 
 .slide-container{
   display: flex;
-  min-height: 100vh;
+  min-height: 100%;
 }
 
 .horizontal-scroll-wrapper .slide{
@@ -156,7 +159,7 @@ h1{
   align-items: center;
   background-color: #d8fcaf;
   min-width: 100vw;
-  min-height: 100vh;
+  min-height: 100%;
 
 }
 

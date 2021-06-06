@@ -465,6 +465,8 @@ resizeSlider(){
 			const pushUpEl = document.querySelector(`${this.params.pushUp}`)
 			this.pushUpVal = pushUpEl.offsetHeight 
 			this.slideWrapper.style.top = `${this.pushUpVal}px`
+			const sliderHeight = window.innerHeight - this.pushUpVal
+			this.slideWrapper.style.height = `${sliderHeight}px`
 			this.pushUpResize = true
 
 		}		
