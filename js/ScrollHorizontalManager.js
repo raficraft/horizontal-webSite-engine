@@ -14,20 +14,16 @@ class ScrollHorizontalManager {
     this.params = Object.assign(
       {},
       {
-        slideXWithMouseWheel: false,
+        slideXWithMouseWheel: true,
         sliderName: "hs",
         currentSlide: 0,
-
         infiniteLoop: true,
-
         slideWidth: 95,
         slideTransition: "0.3",
         slideLink: true,
         jumpLink: false,
-
         pushUp: false,
         puhsDown: false,
-
         linkClassName: "linkSlideHorizontal",
       },
       params
