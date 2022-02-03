@@ -347,10 +347,10 @@ class ScrollHorizontalManager {
 
   manageDrag() {
     /*
-		this.scrollContainer.addEventListener('mousedown', e => 	this.startDrag(e) )
-		window.addEventListener('mousemove' , e => 	this.drag(e) )
-		window.addEventListener('mouseup' , e => 	this.endDrag(e)	)
-		*/
+		  this.scrollContainer.addEventListener('mousedown', e => 	this.startDrag(e) )
+		  window.addEventListener('mousemove' , e => 	this.drag(e) )
+		  window.addEventListener('mouseup' , e => 	this.endDrag(e)	)
+		  */
     this.scrollContainer.addEventListener("dragstart", (e) =>
       e.preventDefault()
     );
