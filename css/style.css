@@ -64,7 +64,7 @@ html,body{
 
 a{
   text-decoration: none;
-  font-size: 1.5rem;
+  font-size: 1rem;
   color: rgb(255, 255, 255);
 }
 
@@ -83,19 +83,12 @@ header{
   z-index: 10;
 }
 
-footer{
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  position : fixed;
-  z-index: 100;
-  width : 100%;
-  bottom : 0;
-  left : 0;
-  padding : 0 1.5rem 3rem;
-}
+
 
 .socialIcon{
+  position: absolute;
+  bottom : 1rem;
+  left : 1rem;
   display: flex;
   justify-content: space-around;
   background-color: white;
@@ -118,23 +111,28 @@ footer{
   transform : scale(1.2)
 }
 
-
-
 nav{
   display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  width : 100%;
 }
 
 nav a{
   display: flex;
-  margin-left : 1.5rem;
-  padding :1rem;
+  padding :1rem 0.5rem;
 }
 
 h1{
-  font-size: 4rem;
+  font-size: 2.5rem;
   margin-bottom: 1rem;
 }
 
+
+h2{
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
 
 
 .horizontal-scroll-wrapper {
@@ -166,12 +164,18 @@ h1{
 .horizontal-scroll-wrapper .slide:nth-child(2n){
   background-color: #9de0e8;
 }
+.horizontal-scroll-wrapper .slide:nth-child(3n){
+  background-color: #e8e39d;
+}
 
 
 .content{
   padding: 3.5rem;
-  max-width: 800px;
+  max-width: clamp(50%, 800px, 80%);
   text-align: center;
+  background-color: white;
+  border-radius: 20px;
+  box-shadow: 5px 5px 15px 1px rgb(79, 79, 79);
 }
 
 .content P{
