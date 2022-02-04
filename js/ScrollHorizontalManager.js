@@ -198,9 +198,9 @@ class ScrollHorizontalManager {
 
   /**
    * Slide with wheel mouse
-   */
+   */ 
 
-  slider() {
+   slider() {
     window.addEventListener(
       "wheel",
       this.debounce(function (e) {
