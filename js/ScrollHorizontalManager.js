@@ -38,8 +38,6 @@ class ScrollHorizontalManager {
       `[data-${this.params.sliderName}Container]`
     );
 
-    console.log([].slice.call(this.slideWrapper.children));
-
     this.slideCollection = [].slice.call(this.scrollContainer.children);
     this.nbSlide = this.slideCollection.length;
 
@@ -49,8 +47,6 @@ class ScrollHorizontalManager {
       this.linkContainer = document.querySelector(
         `[data-${this.params.sliderName}nav]`
       );
-      console.log(this.linkContainer);
-      console.log();
       this.linkCollection = document.querySelectorAll(
         `[data-${this.params.sliderName}Link]`
       );
@@ -85,6 +81,7 @@ class ScrollHorizontalManager {
     if (this.params.slideXWithMouseWheel === true) {
       this.slider();
     }
+
     this.manageDrag();
   }
 
@@ -92,6 +89,7 @@ class ScrollHorizontalManager {
 
   drawSliderPage() {
     //presence of a header
+
     //presence of a footer
 
     const { linkCollection } = this;
@@ -183,8 +181,6 @@ class ScrollHorizontalManager {
         .map((item) => item.cloneNode(true)),
     ];
 
-    console.log(this.slideCollection);
-
     //redefinition of the number of slides
     this.nbSlide = this.slideCollection.length;
 
@@ -206,7 +202,7 @@ class ScrollHorizontalManager {
 
   slider() {
     window.addEventListener(
-      "mousewheel",
+      "wheel",
       this.debounce(function (e) {
         if (e.deltaY > 0) {
           this.goToNext();
@@ -431,7 +427,6 @@ class ScrollHorizontalManager {
   }
 
   translate(value) {
-    //	console.log('on translate de ' , value+'vw');
     this.scrollContainer.style.transform = `translate3d(${value}vw , 0, 0)`;
   }
 
@@ -455,8 +450,6 @@ class ScrollHorizontalManager {
       this.params.pushDown !== false &&
       typeof this.params.pushDown === "string"
     ) {
-      console.log(`${this.params.pushDown}`);
-
       const pushDownEl = document.querySelector(`${this.params.pushDown}`);
       this.pushDownVal = pushDownEl.offsetHeight;
       this.slideWrapper.style.bottom = `${this.pushUpVal}px`;
