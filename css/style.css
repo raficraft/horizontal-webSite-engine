@@ -139,6 +139,8 @@ h2{
   overflow-x: hidden;
   position : absolute;
   width : 100%;
+  min-height: 100%;
+  height: 100%;
   display: flex;
   background-color: red;
   overflow-x: hidden;
@@ -148,6 +150,7 @@ h2{
 .slide-container{
   display: flex;
   min-height: 100%;
+  align-self: stretch;
 }
 
 .horizontal-scroll-wrapper .slide{
